@@ -2,7 +2,8 @@
 #include <array>
 using namespace std;
 
-const int stepsPerRevolution = 2048, speed = 8;
+const int stepsPerRevolution = 2048, speed = 5;
+unsigned long start = 0;
 
 enum Side {
   B, L, R, D, F, U, UNDEFINED
@@ -14,7 +15,7 @@ Side fromChar(char c) {
       return B;
     case 'L':
       return L;
-    cazse 'R':
+    case 'R':
       return R;
     case 'F':
       return F;
@@ -47,13 +48,20 @@ void move(char buf[]) {
     // move("L3");
 
     steppers[R].step(stepsPerRevolution / 4);
+    delay(500);
     steppers[L].step(stepsPerRevolution / 4);
+    delay(500);
     steppers[F].step(stepsPerRevolution / 2);
+    delay(500);
     steppers[B].step(stepsPerRevolution / 2);
+    delay(500);
     steppers[R].step(-stepsPerRevolution / 4);
+    delay(500);
     steppers[L].step(-stepsPerRevolution / 4);
+    delay(500);
     
     move(buf);
+    delay(500);
 
     // move("R1");
     // move("L1");
@@ -63,11 +71,17 @@ void move(char buf[]) {
     // move("L3");
 
     steppers[R].step(stepsPerRevolution / 4);
+    delay(500);
     steppers[L].step(stepsPerRevolution / 4);
+    delay(500);
     steppers[F].step(stepsPerRevolution / 2);
+    delay(500);
     steppers[B].step(stepsPerRevolution / 2);
+    delay(500);
     steppers[R].step(-stepsPerRevolution / 4);
+    delay(500);
     steppers[L].step(-stepsPerRevolution / 4);
+    delay(500);
 
     return;
   }
@@ -80,6 +94,8 @@ void move(char buf[]) {
     steppers[side].step(stepsPerRevolution / 2);
   else if (buf[1] == '3')
     steppers[side].step(-stepsPerRevolution / 4);
+  
+  delay(500);
 }
 
 void setup() {
@@ -95,6 +111,12 @@ void loop() {
   if (Serial.available()) {
     buf[0] = Serial.read();
     buf[1] = Serial.read();
-    move(buf);
+
+    if (strncmp(buf, "TB", 2) == 0)
+      start = millis();
+    else if (strncmp(buf, "TE", 2) == 0)
+      Serial.println(millis() - start);
+    else
+      move(buf);
   }
 }
